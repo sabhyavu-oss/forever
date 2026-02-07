@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Question for You ❤️</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- 1. GENERAL PAGE SETUP --- */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden; /* Prevents scrollbars */
+        }
+
+        /* Slideshow Background Setup */
+        .slideshow-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .slideshow-background .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            animation: slideshow 56s infinite;
+        }
+
+        /* Different animation delays for each slide */
+        .slideshow-background .slide:nth-child(1) { animation-delay: 0s; }
+        .slideshow-background .slide:nth-child(2) { animation-delay: 8s; }
+        .slideshow-background .slide:nth-child(3) { animation-delay: 16s; }
+        .slideshow-background .slide:nth-child(4) { animation-delay: 24s; }
+        .slideshow-background .slide:nth-child(5) { animation-delay: 32s; }
+        .slideshow-background .slide:nth-child(6) { animation-delay: 40s; }
+        .slideshow-background .slide:nth-child(7) { animation-delay: 48s; }
+
+        @keyframes slideshow {
+            0% { opacity: 0; transform: scale(1); }
+            2% { opacity: 1; transform: scale(1); }
+            14.2% { opacity: 1; transform: scale(1.05); }
+            16.2% { opacity: 0; transform: scale(1.05); }
+            100% { opacity: 0; transform: scale(1.05); }
+        }
+
+        /* Dark overlay to make text readable */
+        .overlay-tint {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Adjust darkness here (0.5 = 50%) */
+            z-index: 1;
+            pointer-events: none; /* Allows clicking through to buttons */
+        }
+
+        /* --- 2. FLOATING HEARTS ANIMATION --- */
+        .heart {
+            position: absolute;
+            bottom: -10vh;
+            display: inline-block;
+            height: 30px;
+            width: 30px;
+            margin: 0 10px;
+            transform: rotate(-45deg);
+            animation: float 6s linear infinite;
+            z-index: 0; /* Behind the glass box */
+            background-color: #ff758f;
+        }
+        
+        /* Creating the heart shape using pseudo-elements */
+        .heart:before, .heart:after {
+            content: "";
+            border-radius: 50%;
+            height: 30px;
+            width: 30px;
+            position: absolute;
+            background-color: inherit;
+        }
+        .heart:before { top: -15px; left: 0; }
+        .heart:after { left: 15px; top: 0; }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(-45deg) scale(1); opacity: 0.8; }
+            100% { transform: translateY(-110vh) rotate(-45deg) scale(1.2); opacity: 0; }
+        }
+
+        /* --- 3. THE "CLICK TO OPEN" CURTAIN --- */
+        #opener {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            cursor: pointer;
+            transition: opacity 1s ease;
+            text-align: center;
+        }
+
+        /* Glass effect overlay for opener */
+        #opener > div {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 60px 80px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        #opener h2 {
+            font-size: 2.5em;
+            color: #d32f2f;
+            text-shadow: 2px 2px 8px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.6);
+            animation: pulse 1.5s infinite;
+            margin: 0;
+        }
+
+        #opener p {
+            text-shadow: 1px 1px 4px rgba(255,255,255,0.8);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- 4. MAIN CONTENT BOX --- */
+        .container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .glass-box {
+            background: rgba(255, 255, 255, 0.9); /* White glass effect */
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+
+        h1 {
+            color: #d32f2f;
+            font-size: 2em;
+            min-height: 2.4em; /* Keeps space for typewriter text */
+            margin-bottom: 20px;
+        }
+
+        .gif-container img {
+            width: 100%;
+            max-width: 250px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        #success-gif { display: none; }
+
+        /* --- 5. BUTTONS --- */
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            height: 60px;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #yesBtn {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4);
+        }
+        #yesBtn:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(255, 65, 108, 0.6); }
+
+        #noBtn {
+            background-color: #e0e0e0;
+            color: #333;
+            position: absolute; /* Allows movement */
+        }
+        
+        /* Mobile Music Button (just in case) */
+        .music-control {
+            margin-top: 15px;
+            font-size: 0.8em;
+            color: #888;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Slideshow Background -->
+    <div class="slideshow-background">
+        <div class="slide" style="background-image: url('image1.jpg');"></div>
+        <div class="slide" style="background-image: url('image2.jpg');"></div>
+        <div class="slide" style="background-image: url('image3.jpg');"></div>
+        <div class="slide" style="background-image: url('image4.jpg');"></div>
+        <div class="slide" style="background-image: url('image5.jpg');"></div>
+        <div class="slide" style="background-image: url('image6.jpg');"></div>
+        <div class="slide" style="background-image: url('image7.jpg');"></div>
+    </div>
+
+    <audio id="bgMusic" loop>
+        <source src="song.mp3" type="audio/mp3">
+    </audio>
+
+    <div id="opener">
+        <div>
+            <h2>💌 Hi Jaan! Good Morning...</h2>
+            <p style="font-size: 1.2em; color: #555;">(Tap with Love)</p>
+        </div>
+    </div>
+
+    <div class="overlay-tint"></div>
+
+    <div class="container">
+        <div class="glass-box">
+            <h1 id="main-text"></h1>
+
+            <div class="gif-container">
+                <img id="initial-gif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaGptNm1lZ2wzYmYxYnh5aTNhZW80eHVjYjJ2YnZ6Y2IyZzN4YjY5eSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/MDJ9IbxxvDUQM/giphy.gif" alt="Asking Bear">
+                
+                <img id="success-gif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcmV6Y3Z2ZzZ1aG1lZ2wzYmYxYnh5aTNhZW80eHVjYjJ2YnZ6Y2IyZzN4YjY5eSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/JUXS6l5rcBWWszBPw7/giphy.gif" alt="Happy Bear">
+            </div>
+
+            <div class="buttons">
+                <button id="yesBtn">YES!</button>
+                <div style="position: relative; width: 80px;">
+                     <button id="noBtn">No</button>
+                </div>
+            </div>
+            
+            <div class="music-control" onclick="document.getElementById('bgMusic').play()">
+                🎵 Music not playing? Tap here
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- VARIABLES ---
+        const opener = document.getElementById('opener');
+        const audio = document.getElementById('bgMusic');
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const mainText = document.getElementById('main-text');
+        const initialGif = document.getElementById('initial-gif');
+        const successGif = document.getElementById('success-gif');
+        const buttonsContainer = document.querySelector('.buttons');
+        const musicControl = document.querySelector('.music-control');
+
+        // --- 1. START EXPERIENCE (OPENER) ---
+        opener.addEventListener('click', () => {
+            // Fade out opener
+            opener.style.opacity = '0';
+            setTimeout(() => { opener.style.display = 'none'; }, 1000);
+
+            // Play Music (FIX: Better error handling)
+            audio.volume = 0.5; // Set volume to 50%
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(e => {
+                    console.log("Audio autoplay blocked by browser. User can click manual button.");
+                });
+            }
+
+            // Start Typewriter effect
+            setTimeout(typeWriter, 1000);
+        });
+
+        // --- 2. TYPEWRITER EFFECT ---
+        const textToType = "Will you be my girlfriend? ❤️";
+        let charIndex = 0;
+        
+        function typeWriter() {
+            if (charIndex < textToType.length) {
+                mainText.innerHTML += textToType.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 100); // Speed of typing
+            }
+        }
+
+        // --- 3. FLOATING HEARTS BACKGROUND ---
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            
+            // Random styling
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.animationDuration = Math.random() * 2 + 3 + "s";
+            
+            // Random colors (Pink/Red spectrum) - FIX: Actually apply the color
+            const colors = ['#ff4d6d', '#ffb3c1', '#ff758f', '#c9184a'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            heart.style.backgroundColor = randomColor; // FIX: Apply color to heart
+            
+            // Random opacity variation
+            heart.style.opacity = Math.random() * 0.3 + 0.5; // FIX: Adjusted range (0.5-0.8)
+            
+            document.body.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, 6000); // FIX: Match animation duration
+        }
+        setInterval(createHeart, 300);
+
+        // --- 4. "NO" BUTTON LOGIC ---
+        let noClicks = 0;
+        // CUSTOMIZE YOUR "NO" TEXTS HERE
+        const noTexts = [
+            "NO? Ehh WTF?", 
+            "Jaan Seriously? No??", 
+            "No? Who will annoy you then?", 
+            "Eh u blind? this is not Yes button ;(", 
+            "Try Harder my love...", 
+            "You have no choice",
+            "Enough! Say Yes now!"
+        ];
+
+        function moveNoButton() {
+            // FIX: Better boundary checking for button movement
+            const maxX = window.innerWidth - noBtn.offsetWidth - 20;
+            const maxY = window.innerHeight - noBtn.offsetHeight - 20;
+            const x = Math.random() * Math.max(maxX, 0);
+            const y = Math.random() * Math.max(maxY, 0);
+
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = `${x}px`;
+            noBtn.style.top = `${y}px`;
+
+            if (noClicks < noTexts.length) {
+                noBtn.innerText = noTexts[noClicks];
+                noClicks++;
+            }
+        }
+
+        noBtn.addEventListener('mouseover', moveNoButton);
+        noBtn.addEventListener('click', (e) => {
+             e.preventDefault();
+             moveNoButton();
+        });
+
+        // FIX: Add touch support for mobile devices
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            moveNoButton();
+        });
+
+        // --- 5. "YES" BUTTON LOGIC (CONFETTI!) ---
+        yesBtn.addEventListener('click', () => {
+            // Update Text & Visuals
+            mainText.innerHTML = "YAY! I love you! ❤️<br>Best day ever!";
+            initialGif.style.display = 'none';
+            successGif.style.display = 'block';
+            buttonsContainer.style.display = 'none';
+            noBtn.style.display = 'none';
+            musicControl.style.display = 'none'; // Hide manual music button
+
+            // Trigger Confetti
+            const duration = 15 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+
+                const particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        });
+
+    </script>
+</body>
+</html>
